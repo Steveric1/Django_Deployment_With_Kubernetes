@@ -1,0 +1,3 @@
+#Exclude dockerfile
+Dockerfile
+env_variables.txt

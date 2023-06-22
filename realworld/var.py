@@ -1,0 +1,6 @@
+# DB_NAME = 'django_db'
+# DB_USER = 'root'
+# # MYSQL_PASSWORD = 'Django1234'
+# MYSQL_PORT = '3306'
+# MYSQL_HOST = 'mysql-service'
+# MYSQL_ROOT_PASSWORD = 'rootpassword'

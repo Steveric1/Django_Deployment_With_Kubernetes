@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+  labels:
+    app: django-postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django-postgresql
+  template:
+    metadata:
+      name: django-postgresql
+      labels:
+        app: django-postgresql
+    spec:
+      containers:
+        - name: django-postgresql
+          image: postgres:12.15
+          resources:
+           limits:
+             memory: "1Gi"
+             cpu: 1
+          env:
+            - name: DATABASE_ENGINE
+              value: "django.db.backends.postgresql"
+            - name: POSTGRES_DB
+              valueFrom:
+                 secretKeyRef:
+                    name: postgresql
+                    key: db_name
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                   name: postgresql
+                   key: db_user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql
+                  key: db_passwd
+            - name: DB_HOST
+              value: postgres-service
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgresql-pvc
+      
+---
+#postgresql database service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec: 
+  selector:
+    app: django-postgresql
+  ports:
+   - name: django-postgresql
+     protocol: TCP
+     port: 5432
+     targetPort: 5432
+  type: ClusterIP
